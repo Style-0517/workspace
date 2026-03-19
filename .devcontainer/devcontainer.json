@@ -1,3 +1,3 @@
 {
-  "postStartCommand": "sudo apt-get install -y tmux --fix-missing 2>/dev/null; bash /workspaces/workspace/Script/tmux-setup.sh"
+  "postStartCommand": "sudo apt-get install -y tmux --fix-missing 2>/dev/null; [ -d ~/.tmux/plugins/tpm ] || git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm; tmux start-server; tmux source ~/.tmux.conf 2>/dev/null; ~/.tmux/plugins/tpm/bin/install_plugins 2>/dev/null; bash /workspaces/workspace/Script/tmux-setup.sh"
 }

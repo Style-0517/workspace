@@ -1,4 +1,5 @@
 build
 bin
-.vscode
+.vscode/*
+!.vscode/tasks.json
 node_modules

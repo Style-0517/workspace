@@ -1,0 +1,26 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "claude",
+      "type": "shell",
+      "command": "tmux new-session -A -s claude",
+      "presentation": { "panel": "new", "name": "claude", "focus": true },
+      "runOptions": { "runOn": "folderOpen" }
+    },
+    {
+      "label": "claude-sub",
+      "type": "shell",
+      "command": "tmux new-session -A -s claude-sub",
+      "presentation": { "panel": "new", "name": "claude-sub" },
+      "runOptions": { "runOn": "folderOpen" }
+    },
+    {
+      "label": "clm",
+      "type": "shell",
+      "command": "tmux new-session -A -s clm",
+      "presentation": { "panel": "new", "name": "clm" },
+      "runOptions": { "runOn": "folderOpen" }
+    }
+  ]
+}
