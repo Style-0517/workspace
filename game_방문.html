@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방문</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0c0c0c;
+  --text: #d8d8d8;
+  --dim: #555;
+  --faint: #222;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Serif KR', 'Apple SD Gothic Neo', Georgia, serif;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 2.5s ease;
+  overflow: hidden;
+}
+
+#container {
+  width: 420px;
+  max-width: 92vw;
+  padding: 1rem 0;
+}
+
+#header {
+  font-size: 0.58rem;
+  color: #1a1a1a;
+  letter-spacing: 0.18em;
+  margin-bottom: 2.2rem;
+  text-align: right;
+  transition: color 0.8s ease;
+  user-select: none;
+}
+
+#chat-area {
+  min-height: 200px;
+  margin-bottom: 2.4rem;
+}
+
+.msg {
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  animation: appear 0.65s ease forwards;
+}
+
+.msg-label {
+  font-size: 0.56rem;
+  color: #252525;
+  letter-spacing: 0.14em;
+  margin-bottom: 0.38rem;
+}
+
+.msg-text {
+  line-height: 1.95;
+  font-size: 0.92rem;
+  color: #d0d0d0;
+}
+
+.msg-sub {
+  font-size: 0.65rem;
+  color: #242424;
+  margin-top: 0.45rem;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.msg-player {
+  text-align: right;
+}
+.msg-player .msg-text {
+  color: #5a5a5a;
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
+#choices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.choice {
+  background: none;
+  border: 1px solid #1e1e1e;
+  color: #686868;
+  padding: 0.68rem 1rem;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.choice:hover {
+  border-color: #555;
+  color: #bbb;
+}
+
+.choice:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+#continue-btn {
+  background: none;
+  border: none;
+  color: #4a4a4a;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  width: 100%;
+  text-align: center;
+  padding: 0.6rem;
+  letter-spacing: 0.14em;
+  margin-top: 0.8rem;
+  transition: color 0.3s;
+}
+#continue-btn:hover { color: #666; }
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.8s ease;
+  z-index: 100;
+}
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+<div id="overlay"></div>
+<div id="container">
+  <div id="header">■</div>
+  <div id="chat-area"></div>
+  <div id="choices"></div>
+</div>
+
+<script>
+'use strict';
+
+// ─────────────────────────────────────────────
+// 게임 데이터
+// ─────────────────────────────────────────────
+const SCENES = [
+  {
+    id: 'intro',
+    type: 'intro',
+    lines: [
+      '눈을 뜨자 낯선 방이었다.',
+      '',
+      '맞은편에 누군가 앉아 있다.',
+      '',
+      '규칙은 하나다.',
+      '',
+      '방 주인이 나가도 좋다는 신호를 보내면,',
+      '고개를 숙이며 말해야 한다.',
+      '',
+      '"초대해 주셔서 감사했습니다."',
+      '',
+      '신호를 눈치채지 못하거나,',
+      '신호가 아닌데 나가려 하면',
+      '',
+      '...',
+    ],
+    next: 'scene1'
+  },
+
+  {
+    id: 'scene1',
+    type: 'chat',
+    host: '어서 오세요. 오래 기다렸어요.',
+    sub: null,
+    choices: [
+      { text: '기다리게 해서 죄송합니다.', next: 'scene2' },
+      { text: '...저를 기다리고 계셨나요?',  next: 'bad' },
+      { text: '처음 뵙겠습니다.',             next: 'scene2' },
+    ]
+  },
+
+  {
+    id: 'scene2',
+    type: 'chat',
+    host: '마음에 드셨으면 해서 특별히 준비했어요.',
+    sub: null,
+    choices: [
+      { text: '정성껏 준비해주셨군요.',    next: 'scene3' },
+      { text: '무엇을 준비하셨나요?',      next: 'bad' },
+      { text: '정말 아늑한 방이네요.',     next: 'scene3' },
+    ]
+  },
+
+  {
+    id: 'scene3',
+    type: 'chat',
+    host: '아까 하신 말씀이 참 기억에 남네요.',
+    sub: '(나는 아무 말도 하지 않았다)',
+    choices: [
+      { text: '...감사합니다.',          next: 'scene4' },
+      { text: '제가 무슨 말을 했나요?',  next: 'bad' },
+      { text: '별말씀을요.',             next: 'scene4' },
+    ]
+  },
+
+  // ── 타이머 씬 ──────────────────────────────
+  // 이 씬의 말은 신호가 아니다.
+  // "초대해 주셔서..."를 말하면 오히려 죽는다.
+  // 28초 안에 대답하지 않으면 자동으로 bad end.
+  {
+    id: 'scene4',
+    type: 'timer',
+    host: '저도 참 즐거운 시간이었어요.',
+    sub: null,
+    timeout: 28,
+    choices: [
+      { text: '저도요.',                         next: 'scene5' },
+      { text: '초대해 주셔서 감사했습니다.',     next: 'bad_signal' },
+      { text: '앞으로도 종종 뵐 수 있을까요?',  next: 'bad' },
+    ]
+  },
+
+  // ── 진짜 신호 ─────────────────────────────
+  {
+    id: 'scene5',
+    type: 'chat',
+    host: '저도 슬슬 정리할 게 생겼네요.',
+    sub: null,
+    choices: [
+      { text: '초대해 주셔서 감사했습니다.',  next: 'good' },
+      { text: '무슨 일이 있으세요?',          next: 'bad' },
+      { text: '조금만 더 계셔도 될까요?',     next: 'bad' },
+    ]
+  },
+];
+
+// ─────────────────────────────────────────────
+// 상태
+// ─────────────────────────────────────────────
+let timerHandle  = null;
+let timerRemain  = 30;
+
+// ─────────────────────────────────────────────
+// DOM 헬퍼
+// ─────────────────────────────────────────────
+const $chat    = () => document.getElementById('chat-area');
+const $choices = () => document.getElementById('choices');
+const $header  = () => document.getElementById('header');
+const $overlay = () => document.getElementById('overlay');
+
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+function clearAll() {
+  $chat().innerHTML    = '';
+  $choices().innerHTML = '';
+}
+
+function addHostMsg(text, sub = null) {
+  return new Promise(resolve => {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg';
+
+    const label = document.createElement('div');
+    label.className = 'msg-label';
+    label.textContent = '···';
+    wrap.appendChild(label);
+
+    const p = document.createElement('div');
+    p.className = 'msg-text';
+    p.textContent = text;
+    wrap.appendChild(p);
+
+    if (sub) {
+      const s = document.createElement('div');
+      s.className = 'msg-sub';
+      s.textContent = sub;
+      wrap.appendChild(s);
+    }
+
+    $chat().appendChild(wrap);
+    setTimeout(resolve, 750);
+  });
+}
+
+function addPlayerMsg(text) {
+  return new Promise(resolve => {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg msg-player';
+    const p = document.createElement('div');
+    p.className = 'msg-text';
+    p.textContent = text;
+    wrap.appendChild(p);
+    $chat().appendChild(wrap);
+    setTimeout(resolve, 850);
+  });
+}
+
+function showChoices(choices, callback) {
+  const area = $choices();
+  area.innerHTML = '';
+  choices.forEach((c, i) => {
+    setTimeout(() => {
+      const btn = document.createElement('button');
+      btn.className = 'choice';
+      btn.textContent = c.text;
+      btn.onclick = () => {
+        area.querySelectorAll('.choice').forEach(b => b.disabled = true);
+        callback(c);
+      };
+      area.appendChild(btn);
+    }, i * 130 + 350);
+  });
+}
+
+function fadeOut(ms = 1800) {
+  return new Promise(resolve => {
+    const ov = $overlay();
+    ov.style.transition = `opacity ${ms / 1000}s ease`;
+    ov.style.opacity = '1';
+    setTimeout(resolve, ms);
+  });
+}
+
+function fadeIn(ms = 1400) {
+  return new Promise(resolve => {
+    const ov = $overlay();
+    ov.style.transition = `opacity ${ms / 1000}s ease`;
+    ov.style.opacity = '0';
+    setTimeout(resolve, ms);
+  });
+}
+
+// ─────────────────────────────────────────────
+// 씬 실행
+// ─────────────────────────────────────────────
+async function runScene(id) {
+  const scene = SCENES.find(s => s.id === id);
+  if (!scene) return;
+  clearAll();
+
+  if (scene.type === 'intro')  return runIntro(scene);
+  if (scene.type === 'chat')   return runChat(scene);
+  if (scene.type === 'timer')  return runTimerScene(scene);
+}
+
+async function runIntro(scene) {
+  for (const line of scene.lines) {
+    await wait(line === '' ? 280 : 680);
+    const div = document.createElement('div');
+    div.className = 'msg';
+    div.style.textAlign = 'center';
+
+    if (line.startsWith('"')) {
+      div.style.color  = '#999';
+      div.style.fontSize = '0.94rem';
+    } else if (line.startsWith('규칙')) {
+      div.style.color = '#777';
+    } else {
+      div.style.color = '#3a3a3a';
+      div.style.fontSize = '0.86rem';
+    }
+
+    const p = document.createElement('div');
+    p.textContent = line || '\u00A0';
+    div.appendChild(p);
+    $chat().appendChild(div);
+  }
+
+  await wait(900);
+  const btn = document.createElement('button');
+  btn.id = 'continue-btn';
+  btn.textContent = '...';
+  btn.onclick = () => runScene(scene.next);
+  $choices().appendChild(btn);
+}
+
+async function runChat(scene) {
+  await wait(450);
+  await addHostMsg(scene.host, scene.sub);
+  await wait(250);
+
+  return new Promise(resolve => {
+    showChoices(scene.choices, async choice => {
+      $choices().innerHTML = '';
+      await addPlayerMsg(choice.text);
+      resolve();
+      await wait(250);
+      handleNext(choice.next);
+    });
+  });
+}
+
+async function runTimerScene(scene) {
+  timerRemain = scene.timeout;
+
+  await wait(450);
+  await addHostMsg(scene.host, scene.sub);
+  await wait(250);
+
+  // 타이머 시작 — 화면에 직접 표시하지 않는다
+  timerHandle = setInterval(() => {
+    timerRemain--;
+    updatePressure();
+    if (timerRemain <= 0) {
+      clearInterval(timerHandle);
+      $choices().querySelectorAll('.choice').forEach(b => b.disabled = true);
+      handleNext('bad_timeout');
+    }
+  }, 1000);
+
+  return new Promise(resolve => {
+    showChoices(scene.choices, async choice => {
+      clearInterval(timerHandle);
+      resetPressure();
+      $choices().innerHTML = '';
+      await addPlayerMsg(choice.text);
+      resolve();
+      await wait(250);
+      handleNext(choice.next);
+    });
+  });
+}
+
+// 타이머 압박 — 배경이 아주 조금씩 어두워짐. 헤더 ■만 늘어난다.
+function updatePressure() {
+  const h = $header();
+  if (timerRemain > 18) {
+    h.textContent = '■';
+    h.style.color = '#1a1a1a';
+  } else if (timerRemain > 12) {
+    h.textContent = '■ ■';
+    h.style.color = '#2a1818';
+    document.body.style.backgroundColor = '#0e0a0a';
+  } else if (timerRemain > 6) {
+    h.textContent = '■ ■ ■';
+    h.style.color = '#3e1818';
+    document.body.style.backgroundColor = '#110909';
+  } else {
+    h.textContent = '■ ■ ■ ■';
+    h.style.color = '#581818';
+    document.body.style.backgroundColor = '#140707';
+  }
+}
+
+function resetPressure() {
+  $header().textContent = '■';
+  $header().style.color = '#1a1a1a';
+  document.body.style.backgroundColor = '#0c0c0c';
+}
+
+// ─────────────────────────────────────────────
+// 결과 처리
+// ─────────────────────────────────────────────
+async function handleNext(next) {
+  if (next === 'bad' || next === 'bad_timeout' || next === 'bad_signal') {
+    endBad(next);
+  } else if (next === 'good') {
+    endGood();
+  } else {
+    runScene(next);
+  }
+}
+
+async function endBad(type) {
+  if (type === 'bad_signal') {
+    await wait(700);
+    await addHostMsg('...잠깐요.');
+    await wait(1600);
+  } else if (type === 'bad_timeout') {
+    await wait(500);
+    await addHostMsg('아직 계실 건가요?');
+    await wait(1800);
+  }
+
+  await fadeOut(2000);
+  await wait(400);
+  resetPressure();
+  clearAll();
+  await fadeIn(1500);
+  await wait(200);
+  runScene('intro');
+}
+
+async function endGood() {
+  await wait(600);
+  await addHostMsg('...네. 고마워요.');
+  await wait(500);
+  await addHostMsg('조심히 가세요.');
+  await wait(2200);
+  await fadeOut(2500);
+  await wait(600);
+  clearAll();
+  document.body.style.backgroundColor = '#0c0c0c';
+
+  const lines = [
+    '문이 열렸다.',
+    '',
+    '바깥은',
+    '처음 온 것 같은 느낌이었다.',
+    '',
+    '아니,',
+    '',
+    '처음 왔던 적이 있었나?',
+    '',
+    '...',
+  ];
+
+  await fadeIn(1600);
+
+  for (const line of lines) {
+    await wait(line === '' ? 260 : 950);
+    const div = document.createElement('div');
+    div.className = 'msg';
+    div.style.textAlign = 'center';
+    div.style.color     = '#383838';
+    div.style.fontSize  = '0.88rem';
+    const p = document.createElement('div');
+    p.textContent = line || '\u00A0';
+    div.appendChild(p);
+    $chat().appendChild(div);
+  }
+
+  // 마지막 한 줄
+  await wait(2200);
+  const last = document.createElement('div');
+  last.className = 'msg';
+  last.style.cssText = 'text-align:center; font-size:0.68rem; letter-spacing:0.14em;';
+  const p = document.createElement('div');
+  p.style.color = '#1c1c1c';
+  p.textContent = '또 오세요.';
+  last.appendChild(p);
+  $chat().appendChild(last);
+}
+
+// ─────────────────────────────────────────────
+// 시작
+// ─────────────────────────────────────────────
+window.addEventListener('load', () => {
+  setTimeout(() => runScene('intro'), 400);
+});
+</script>
+</body>
+</html>

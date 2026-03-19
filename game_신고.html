@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>경찰청 실종자 신고 포털</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #f0f2f5;
+  font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif;
+  font-size: 14px;
+  color: #222;
+  min-height: 100vh;
+}
+
+#header {
+  background: #1a3a6b;
+  color: #fff;
+  padding: 0;
+  border-bottom: 3px solid #c8a84b;
+}
+
+#header-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#header h1 {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+#header h1 span {
+  font-size: 11px;
+  color: #a8c4e8;
+  margin-left: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+#case-count {
+  font-size: 11px;
+  color: #a8c4e8;
+  letter-spacing: 0.02em;
+}
+
+#main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 28px 20px 60px;
+}
+
+#breadcrumb {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 20px;
+}
+
+#breadcrumb span { color: #1a3a6b; }
+
+#form-box {
+  background: #fff;
+  border: 1px solid #d0d7e2;
+  border-top: 3px solid #1a3a6b;
+}
+
+#form-title {
+  padding: 16px 24px 14px;
+  border-bottom: 1px solid #e8ecf2;
+}
+
+#form-title h2 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a3a6b;
+}
+
+#form-title p {
+  font-size: 11px;
+  color: #888;
+  margin-top: 4px;
+}
+
+#step-bar {
+  display: flex;
+  border-bottom: 1px solid #e8ecf2;
+  background: #f8f9fb;
+}
+
+.step-item {
+  flex: 1;
+  text-align: center;
+  padding: 10px 4px;
+  font-size: 11px;
+  color: #aaa;
+  border-right: 1px solid #e8ecf2;
+  position: relative;
+}
+
+.step-item:last-child { border-right: none; }
+
+.step-item.active {
+  color: #1a3a6b;
+  font-weight: 600;
+  background: #fff;
+}
+
+.step-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0; right: 0;
+  height: 2px;
+  background: #1a3a6b;
+}
+
+.step-item.done { color: #666; }
+
+#form-content {
+  padding: 28px 24px;
+}
+
+.field-row {
+  display: flex;
+  margin-bottom: 20px;
+  align-items: flex-start;
+}
+
+.field-label {
+  width: 130px;
+  min-width: 130px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  padding-top: 6px;
+  line-height: 1.5;
+}
+
+.field-label .required {
+  color: #c0392b;
+  margin-left: 2px;
+}
+
+.field-label .optional {
+  color: #aaa;
+  font-size: 10px;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.field-input {
+  flex: 1;
+}
+
+.field-input input[type="text"],
+.field-input input[type="number"] {
+  width: 200px;
+  height: 32px;
+  border: 1px solid #ccc;
+  padding: 0 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #333;
+  outline: none;
+}
+
+.field-input input[type="text"]:focus,
+.field-input input[type="number"]:focus {
+  border-color: #1a3a6b;
+}
+
+.radio-group {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-top: 5px;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #444;
+}
+
+.radio-group input[type="radio"] {
+  cursor: pointer;
+  accent-color: #1a3a6b;
+}
+
+.count-tag {
+  color: #999;
+  font-size: 11px;
+  margin-left: 2px;
+}
+
+.sub-field {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: #f8f9fb;
+  border: 1px solid #e0e5ee;
+  display: none;
+}
+
+.sub-field.visible { display: block; }
+
+.sub-field .field-row {
+  margin-bottom: 0;
+}
+
+.field-note {
+  font-size: 11px;
+  color: #888;
+  margin-top: 6px;
+  line-height: 1.6;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #eef0f4;
+  margin: 6px 0 20px;
+}
+
+#form-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e8ecf2;
+  background: #f8f9fb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#form-footer .btn-prev {
+  height: 34px;
+  padding: 0 18px;
+  background: #fff;
+  border: 1px solid #bbb;
+  color: #555;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+#form-footer .btn-prev:hover { background: #f5f5f5; }
+
+#form-footer .btn-next {
+  height: 34px;
+  padding: 0 22px;
+  background: #1a3a6b;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+#form-footer .btn-next:hover { background: #15305c; }
+
+/* 완료 화면 */
+#done-screen {
+  display: none;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+#done-screen .done-icon {
+  width: 48px;
+  height: 48px;
+  background: #1a3a6b;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  color: #fff;
+  font-size: 22px;
+}
+
+#done-screen h3 {
+  font-size: 18px;
+  color: #1a3a6b;
+  margin-bottom: 10px;
+}
+
+#done-screen .done-number {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+#done-screen .done-number strong {
+  color: #1a3a6b;
+  font-size: 15px;
+}
+
+#done-screen .done-desc {
+  font-size: 12px;
+  color: #888;
+  line-height: 1.8;
+  margin-top: 16px;
+}
+
+/* 문자 팝업 */
+#sms-popup {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 260px;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  font-size: 12px;
+  display: none;
+  z-index: 999;
+}
+
+#sms-popup .sms-header {
+  background: #f5f5f5;
+  padding: 8px 12px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #555;
+  font-size: 11px;
+}
+
+#sms-popup .sms-body {
+  padding: 12px 14px;
+  color: #333;
+  line-height: 1.7;
+}
+
+#sms-popup .sms-from {
+  font-size: 10px;
+  color: #aaa;
+  margin-bottom: 8px;
+}
+
+#sms-popup .sms-confirm {
+  padding: 8px 12px;
+  border-top: 1px solid #eee;
+  text-align: right;
+}
+
+#sms-popup .sms-confirm button {
+  background: #1a3a6b;
+  color: #fff;
+  border: none;
+  padding: 4px 12px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* 흰색 오버레이 */
+#white-overlay {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transition: opacity 2.5s ease;
+}
+
+#white-overlay.fade {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* 최종 메시지 */
+#final-msg {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  background: #fff;
+}
+
+#final-msg p {
+  font-size: 14px;
+  color: #333;
+  font-family: 'Malgun Gothic', sans-serif;
+  letter-spacing: 0.04em;
+}
+</style>
+</head>
+<body>
+
+<div id="white-overlay"></div>
+<div id="final-msg"><p>드디어 오셨군요.</p></div>
+
+<div id="header">
+  <div id="header-inner">
+    <h1>경찰청 실종자 신고 포털 <span>Missing Person Report System</span></h1>
+    <div id="case-count">처리 중인 건: 1,247건</div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="breadcrumb">홈 &gt; 민원서비스 &gt; 실종자 신고 &gt; <span>신고서 작성</span></div>
+
+  <div id="form-box">
+    <div id="form-title">
+      <h2>실종자 신고서 작성</h2>
+      <p>실종자 정보를 정확히 입력하시면 더 빠른 수색에 도움이 됩니다.</p>
+    </div>
+
+    <div id="step-bar">
+      <div class="step-item active" id="step1-tab">① 기본 정보</div>
+      <div class="step-item" id="step2-tab">② 신체 특징</div>
+      <div class="step-item" id="step3-tab">③ 목격 상황</div>
+      <div class="step-item" id="step4-tab">④ 실종 경위</div>
+      <div class="step-item" id="step5-tab">⑤ 신고인 정보</div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div id="step1" class="form-step">
+      <div id="form-content">
+        <div class="field-row">
+          <div class="field-label">실종자 성명 <span class="optional">(선택)</span></div>
+          <div class="field-input">
+            <input type="text" id="name-input" placeholder="성명을 입력하세요">
+            <div class="field-note">성명을 모를 경우 미입력하셔도 됩니다.</div>
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="field-row">
+          <div class="field-label">성별 <span class="required">*</span></div>
+          <div class="field-input">
+            <div class="radio-group">
+              <label><input type="radio" name="gender" value="male"> 남성</label>
+              <label><input type="radio" name="gender" value="female"> 여성</label>
+              <label><input type="radio" name="gender" value="unknown"> 알 수 없음</label>
+            </div>
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="field-row">
+          <div class="field-label">나이 <span class="required">*</span></div>
+          <div class="field-input">
+            <input type="number" id="age-input" placeholder="나이 (숫자)" style="width:100px">
+            <div class="field-note">정확한 나이를 모를 경우 추정 나이를 입력하세요.</div>
+          </div>
+        </div>
+      </div>
+      <div id="form-footer">
+        <div></div>
+        <button class="btn-next" onclick="goStep(2)">다음 단계 &gt;</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="step2" class="form-step" style="display:none">
+      <div id="form-content">
+        <div class="field-row">
+          <div class="field-label">키 <span class="required">*</span></div>
+          <div class="field-input">
+            <div class="radio-group">
+              <label><input type="radio" name="height" value="1"> 150cm 미만</label>
+              <label><input type="radio" name="height" value="2"> 150–165cm</label>
+              <label><input type="radio" name="height" value="3"> 165–175cm</label>
+              <label><input type="radio" name="height" value="4"> 175cm 이상</label>
+            </div>
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="field-row">
+          <div class="field-label">체형 <span class="required">*</span></div>
+          <div class="field-input">
+            <div class="radio-group">
+              <label><input type="radio" name="build" value="slim"> 마름</label>
+              <label><input type="radio" name="build" value="normal"> 보통</label>
+              <label><input type="radio" name="build" value="heavy"> 통통</label>
+            </div>
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="field-row">
+          <div class="field-label">특이사항 <span class="optional">(선택)</span></div>
+          <div class="field-input">
+            <input type="text" id="note-input" value="특이사항 없음" style="width:300px">
+            <div class="field-note">흉터, 문신, 안경 착용 여부 등을 입력하세요.</div>
+          </div>
+        </div>
+      </div>
+      <div id="form-footer">
+        <button class="btn-prev" onclick="goStep(1)">&lt; 이전</button>
+        <button class="btn-next" onclick="goStep(3)">다음 단계 &gt;</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div id="step3" class="form-step" style="display:none">
+      <div id="form-content">
+        <div class="field-row">
+          <div class="field-label">마지막 목격 장소 <span class="required">*</span></div>
+          <div class="field-input">
+            <div class="radio-group">
+              <label><input type="radio" name="place" value="home"> 집</label>
+              <label><input type="radio" name="place" value="work"> 직장/학교</label>
+              <label><input type="radio" name="place" value="outdoor"> 야외</label>
+              <label><input type="radio" name="place" value="other"> 기타</label>
+            </div>
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="field-row">
+          <div class="field-label">시간대 <span class="required">*</span></div>
+          <div class="field-input">
+            <div class="radio-group">
+              <label><input type="radio" name="timeband" value="day"> 낮 (06–18시)</label>
+              <label><input type="radio" name="timeband" value="night"> 밤 (18–06시)</label>
+              <label><input type="radio" name="timeband" value="unknown"> 알 수 없음</label>
+            </div>
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="field-row">
+          <div class="field-label">동행인 여부 <span class="required">*</span></div>
+          <div class="field-input">
+            <div class="radio-group">
+              <label><input type="radio" name="companion" value="yes" onchange="showCompanion(true)"> 있음</label>
+              <label><input type="radio" name="companion" value="no" onchange="showCompanion(false)"> 없음</label>
+            </div>
+            <div class="sub-field" id="companion-sub">
+              <div class="field-row">
+                <div class="field-label" style="width:160px; min-width:160px; font-weight:400; color:#555">동행인이 현재 어디 있는지 아십니까?</div>
+                <div class="field-input">
+                  <div class="radio-group">
+                    <label><input type="radio" name="comp-loc" value="know"> 알고 있음</label>
+                    <label><input type="radio" name="comp-loc" value="unknown"> 알 수 없음</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="form-footer">
+        <button class="btn-prev" onclick="goStep(2)">&lt; 이전</button>
+        <button class="btn-next" onclick="goStep(4)">다음 단계 &gt;</button>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div id="step4" class="form-step" style="display:none">
+      <div id="form-content">
+        <div class="field-row">
+          <div class="field-label">실종 경위 <span class="required">*</span></div>
+          <div class="field-input">
+            <div class="radio-group" style="flex-direction: column; gap: 10px;">
+              <label><input type="radio" name="reason" value="runaway"> 가출로 추정 <span class="count-tag">(0건)</span></label>
+              <label><input type="radio" name="reason" value="accident"> 사고로 추정 <span class="count-tag">(43건)</span></label>
+              <label><input type="radio" name="reason" value="crime"> 범죄 피해 우려 <span class="count-tag">(12건)</span></label>
+              <label><input type="radio" name="reason" value="unknown"> 알 수 없음 <span class="count-tag">(1,192건)</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="form-footer">
+        <button class="btn-prev" onclick="goStep(3)">&lt; 이전</button>
+        <button class="btn-next" onclick="goStep(5)">다음 단계 &gt;</button>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div id="step5" class="form-step" style="display:none">
+      <div id="form-content">
+        <div class="field-row">
+          <div class="field-label">신고인 성함 <span class="required">*</span></div>
+          <div class="field-input">
+            <input type="text" id="reporter-name" placeholder="성함을 입력하세요">
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="field-row">
+          <div class="field-label">연락처 <span class="required">*</span></div>
+          <div class="field-input">
+            <input type="text" id="reporter-phone" placeholder="010-0000-0000">
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="field-row">
+          <div class="field-label">실종자와의 관계 <span class="required">*</span></div>
+          <div class="field-input">
+            <div class="radio-group" style="flex-direction: column; gap: 10px;">
+              <label><input type="radio" name="relation" value="family"> 가족</label>
+              <label><input type="radio" name="relation" value="friend"> 지인</label>
+              <label><input type="radio" name="relation" value="self"> 본인 신고</label>
+              <label><input type="radio" name="relation" value="other"> 기타</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="form-footer">
+        <button class="btn-prev" onclick="goStep(4)">&lt; 이전</button>
+        <button class="btn-next" onclick="submitForm()">접수하기</button>
+      </div>
+    </div>
+
+    <!-- 완료 -->
+    <div id="done-screen">
+      <div class="done-icon">✓</div>
+      <h3>접수가 완료되었습니다.</h3>
+      <div class="done-number">접수번호: <strong>2024-NP-1248</strong></div>
+      <div class="done-desc">
+        담당자가 확인 후 연락드리겠습니다.<br>
+        처리 현황은 접수번호로 조회하실 수 있습니다.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 문자 팝업 -->
+<div id="sms-popup">
+  <div class="sms-header">
+    <span>📱 문자 수신</span>
+    <span id="sms-time"></span>
+  </div>
+  <div class="sms-body">
+    <div class="sms-from">발신번호 미표시</div>
+    <div id="sms-text">확인하시겠습니까?</div>
+  </div>
+  <div class="sms-confirm">
+    <button onclick="openSms()">확인</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+let currentStep = 1;
+let smsOpened = false;
+
+function goStep(n) {
+  document.getElementById('step' + currentStep).style.display = 'none';
+  document.getElementById('step' + n).style.display = 'block';
+
+  // 탭 업데이트
+  for (let i = 1; i <= 5; i++) {
+    const tab = document.getElementById('step' + i + '-tab');
+    tab.classList.remove('active', 'done');
+    if (i < n) tab.classList.add('done');
+    if (i === n) tab.classList.add('active');
+  }
+
+  currentStep = n;
+  window.scrollTo(0, 0);
+}
+
+function showCompanion(show) {
+  const sub = document.getElementById('companion-sub');
+  if (show) sub.classList.add('visible');
+  else sub.classList.remove('visible');
+}
+
+// 특이사항 칸: 비우면 다시 채워짐
+const noteInput = document.getElementById('note-input');
+noteInput.addEventListener('blur', function() {
+  if (this.value.trim() === '') {
+    this.value = '특이사항 없음';
+  }
+});
+
+function submitForm() {
+  // 완료 화면으로
+  document.getElementById('step5').style.display = 'none';
+  document.getElementById('done-screen').style.display = 'block';
+
+  // step bar 전부 done
+  for (let i = 1; i <= 5; i++) {
+    const tab = document.getElementById('step' + i + '-tab');
+    tab.classList.remove('active');
+    tab.classList.add('done');
+  }
+
+  // 카운터 업데이트
+  document.getElementById('case-count').textContent = '처리 중인 건: 1,248건';
+
+  // 현재 시각 기록
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('sms-time').textContent = h + ':' + m;
+
+  // 10초 후 문자 팝업
+  setTimeout(() => {
+    document.getElementById('sms-popup').style.display = 'block';
+  }, 10000);
+
+  window.scrollTo(0, 0);
+}
+
+function openSms() {
+  if (smsOpened) return;
+  smsOpened = true;
+
+  const body = document.getElementById('sms-popup').querySelector('.sms-body');
+  const confirm = document.getElementById('sms-popup').querySelector('.sms-confirm');
+  confirm.style.display = 'none';
+
+  body.innerHTML = '<div class="sms-from">발신번호 미표시</div><div id="sms-text" style="font-size:13px; color:#222; padding: 4px 0;">드디어 오셨군요.</div>';
+
+  // 3초 후 흰색 페이드
+  setTimeout(() => {
+    const overlay = document.getElementById('white-overlay');
+    overlay.classList.add('fade');
+
+    setTimeout(() => {
+      document.getElementById('final-msg').style.display = 'flex';
+    }, 2600);
+  }, 3000);
+}
+</script>
+</body>
+</html>
