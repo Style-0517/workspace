@@ -1,0 +1,257 @@
+체인스윕 프론트엔드 이미지 생성 프롬프트
+
+목적
+- 이미지 생성 AI로 체인스윕 모바일 트레이딩 앱의 화면 시안을 만든다.
+- 이후 생성된 이미지를 기준으로 실제 프론트엔드를 최대한 가깝게 구현한다.
+- 따라서 화려한 컨셉 아트가 아니라, 실제 앱 화면처럼 보이는 고해상도 UI 스크린샷이 목표다.
+
+
+1. 공통 마스터 프롬프트
+
+아래 문장을 모든 화면 프롬프트 앞에 공통으로 붙인다.
+
+"ChainSweep, Korean mobile crypto trading app UI, Bithumb-inspired but not copied 1:1, realistic production-ready app screen, ultra clean exchange interface, data-dense layout, white background, thin dividers, restrained flat design, minimal shadows, subtle motion-ready design language, Korean text UI, red for rising prices, blue for falling prices, dark gray typography, compact spacing, precise alignment, clear visual hierarchy, realistic chart/trading interface, front-facing screenshot, no device frame, no hands, no perspective distortion, no 3D mockup, no glossy glassmorphism, no dribbble fantasy, no oversized rounded cards, no purple gradient, no neon, no gaming UI, highly implementable mobile UI, iPhone-style safe area, portrait 9:19.5"
+
+
+2. 공통 스타일 규칙
+
+- 플랫폼 성격
+  - 로그인 없는 개인용 모의투자 모바일 웹앱
+  - 코인 단타 전용
+  - 한국 거래소 앱 감성
+  - 실거래 앱처럼 보이되 실제 결제 느낌은 제외
+
+- 브랜드
+  - 브랜드명은 ChainSweep
+  - 로고는 과하게 크지 않게
+  - 헤더 우측 배지나 작은 텍스트 배지 정도로만 자연스럽게 배치
+  - 브랜드보다 가격, 차트, 주문이 중심이어야 함
+
+- 컬러
+  - 메인 배경: 거의 흰색
+  - 구분선: 연한 회색
+  - 본문 텍스트: 진한 회색 또는 거의 검정
+  - 보조 텍스트: 중간 회색
+  - 상승: 한국 거래소 스타일의 빨강
+  - 하락: 파랑
+  - 강조색은 과하지 않게, 검정/짙은 회색 기반
+
+- 형태
+  - 둥근 카드 남발 금지
+  - 대부분의 영역은 평면 레이어, 얇은 선, 낮은 반경
+  - 큰 정보 박스도 둥글둥글한 카드보다는 패널/섹션 느낌
+  - 카드형이 필요하면 아주 약한 라운드만 허용
+
+- 타이포
+  - 한국 앱 UI 같은 촘촘한 밀도
+  - 가격 숫자는 크고 강하게
+  - 탭/라벨/보조 텍스트는 작고 정돈되게
+  - 과장된 디스플레이 폰트 금지
+
+- 차트 규칙
+  - TradingView 계열처럼 선명하고 얇은 캔들
+  - 픽셀이 깨져 보이지 않아야 함
+  - 볼륨 바, 가격 축, 시간 축, 이동평균선 포함
+  - 차트가 화면의 주인공이어야 함
+  - 확대/축소 가능한 인터페이스 느낌이 있어야 함
+
+- 인터랙션 힌트
+  - 실제 구현 가능한 UI여야 함
+  - 드롭다운, 서랍, 팝오버, 토글 등은 현실적인 구조로
+  - 의미 없는 장식 버튼 금지
+
+
+3. 공통 네거티브 프롬프트
+
+"desktop dashboard, tablet layout, laptop screen, 3D render, clay style, futuristic sci-fi HUD, crypto gaming UI, too many floating cards, giant rounded rectangles, excessive gradients, dark purple theme, neon blue glow, glassmorphism, skeuomorphism, unrealistic typography, crowded cluttered chaos, blurry chart, low-resolution candles, illustration, anime, hand holding phone, device mockup, tilted perspective, empty placeholders, lorem ipsum, english-heavy UI"
+
+
+4. 화면 구조 요약
+
+체인스윕은 사실상 아래 5개 핵심 화면 또는 상태가 필요하다.
+
+1. 메인 차트 화면
+2. 주문 탭 화면
+3. 종목 선택 전체 화면
+4. 알림 팝오버 또는 알림 센터 화면
+5. 도구 서랍 화면(공식, 설정 포함)
+
+이 5장을 같은 스타일로 뽑아두면 이후 구현 기준점으로 쓰기 좋다.
+
+
+5. 화면별 프롬프트
+
+5-1. 메인 차트 화면
+
+프롬프트:
+
+"ChainSweep main trading screen, Korean crypto scalping app, Bithumb-inspired mobile interface, top center market selector showing two lines '비트코인' and 'BTC / USDT', subtle dropdown cue, top right compact ChainSweep badge, timeframe badge '1m', bell notification icon, hamburger menu icon, large current price text, small signed percentage and signed price change below, clean candlestick chart occupying the main area, red up candles and blue down candles, thin moving average lines, volume bars at the bottom of chart, price axis on the right, time axis on the bottom, small zoom controls inside chart, compact tab bar under the price area with tabs 주문 호가 차트 시세 정보, active tab is 차트, realistic mobile exchange app spacing, white background, thin gray dividers, compact Korean labels, production-ready mobile UI screenshot"
+
+화면에 반드시 들어갈 요소:
+- 상단 중앙 종목명 2줄
+- 상단 우측 ChainSweep 배지
+- 상단 우측 1m 배지
+- 종 아이콘
+- 햄버거 아이콘
+- 큰 현재가
+- 퍼센트와 금액 변화
+- 실시간 캔들 차트
+- 이동평균선
+- 거래량 바
+- 하단 탭 바
+
+강조 포인트:
+- 차트가 가장 중요
+- 빗썸처럼 깔끔하고 얇은 선 중심
+- 카드 덩어리 느낌보다 실제 거래 앱 화면 느낌
+
+
+5-2. 주문 탭 화면
+
+프롬프트:
+
+"ChainSweep order screen state, same exact design language as the main chart screen, Korean mobile crypto exchange order interface, active tab is 주문, below the price area a dense exchange-style order panel appears, buy and sell segmented tabs at top, order type selector with 지정가 시장가 자동, order price field, order quantity field, quick amount buttons 50 100 250 500, leverage-like slider style for notional ratio but used for mock sizing, clear primary submit button in Korean, subtle position summary section showing 보유 평단 최근 진입 평가손익, compact order history list under the form, all text in Korean, white background, thin dividers, no oversized cards, highly realistic production app UI"
+
+화면에 반드시 들어갈 요소:
+- 매수 / 매도 토글
+- 지정가 / 시장가 / 자동 토글
+- 가격 입력 필드
+- 수량 입력 필드
+- 빠른 금액 버튼
+- 주문 실행 버튼
+- 포지션 요약
+- 최근 주문 이력
+
+강조 포인트:
+- 입력 폼처럼 보이되 거래소 주문창 밀도 유지
+- 지나치게 동글동글한 폼 금지
+- 폼 요소가 차트 화면과 같은 문법으로 이어져야 함
+
+
+5-3. 종목 선택 전체 화면
+
+프롬프트:
+
+"ChainSweep market picker screen, full-screen Korean market selection view, same Bithumb-inspired visual language, white background, thin separators, compact list rows, header title '종목 선택', list of crypto markets with Korean names and symbol pairs on two lines, examples 비트코인 BTC / USDT, 이더리움 ETH / USDT, 솔라나 SOL / USDT, XRP XRP / USDT, 도지코인 DOGE / USDT, active market subtly highlighted with a soft gray background and small selection indicator, favorites section at the top with star icons, all markets section below, mobile exchange app list design, realistic and clean, no search bar unless minimal and necessary, highly implementable screenshot"
+
+화면에 반드시 들어갈 요소:
+- 종목 선택 헤더
+- 관심 종목 섹션
+- 전체 종목 섹션
+- 2줄 종목명 구조
+- 현재 선택 종목의 은은한 강조
+- 별 아이콘 기반 관심 종목 느낌
+
+강조 포인트:
+- 이 화면은 화려하면 안 됨
+- 리스트 디자인이 핵심
+- 빗썸 느낌의 촘촘한 행 디자인
+
+
+5-4. 알림 팝오버 / 알림 센터 화면
+
+프롬프트:
+
+"ChainSweep alert UI, Korean crypto signal notification interface, same exact mobile exchange styling, bell icon opened with a compact floating popover attached to the top right, popover shows recent signal alerts in a neat stacked list, each alert row includes symbol, timeframe, formula name, detected time, short explanation, small buttons 확인 and 주문 적용, one alert marked as new with a tiny red point accent, white popover with thin border and soft shadow, realistic floating UI, no overlap issues, same style as the main chart screen, production-ready mobile app detail"
+
+확장 화면 버전 프롬프트:
+
+"ChainSweep alert center screen, full alert list screen in the same Korean exchange app style, header for 실시간 알림, unread count indicator, stacked alert items with symbol timeframe formula name explanation time and action buttons, clean white background, thin dividers, compact dense spacing, realistic mobile notification center for a crypto trading app"
+
+화면에 반드시 들어갈 요소:
+- 최근 알림 리스트
+- 심볼
+- 시간봉
+- 공식명
+- 감지 시각
+- 확인 버튼
+- 주문 적용 버튼
+
+강조 포인트:
+- 팝오버는 작고 정교해야 함
+- 전체 화면 버전도 같은 문법으로 연결돼야 함
+
+
+5-5. 도구 서랍 화면
+
+프롬프트:
+
+"ChainSweep right-side tool drawer, slide-in panel from the top-right hamburger side, Korean mobile crypto trading app side drawer, flat Bithumb-like styling, white panel sliding over the main screen from right to left, compact header, subtle ChainSweep identity, list sections for 알림 공식 설정, formula section showing three predefined strategies, settings section containing dark mode toggle and small app preferences, realistic mobile slide-over panel, no card-heavy design, thin dividers, production-ready app UI"
+
+화면에 반드시 들어갈 요소:
+- 오른쪽에서 열리는 서랍
+- 섹션: 알림 / 공식 / 설정
+- 공식 목록 3개
+- 다크모드 토글
+- 체인스윕 브랜딩은 작게
+
+강조 포인트:
+- 바텀시트가 아니라 우측 슬라이드 패널
+- 내부도 카드 덩어리보다 리스트형 정리
+
+
+6. 같은 스타일로 여러 장 뽑는 법
+
+이미지 생성 AI에 아래 문장을 추가하면 화면 톤이 통일되기 쉽다.
+
+"Generate this screen as part of the same app design system as the previous ChainSweep mobile crypto trading screens. Keep identical spacing rules, typography scale, color system, divider style, icon weight, tab height, header structure, and component language."
+
+또는
+
+"Same app, same design language, same Korean exchange UI system, same color rules, same typography, same layout grammar."
+
+
+7. 추천 생성 순서
+
+아래 순서로 생성하면 가장 안정적이다.
+
+1. 메인 차트 화면
+2. 주문 탭 화면
+3. 종목 선택 화면
+4. 알림 팝오버 화면
+5. 도구 서랍 화면
+
+첫 장이 가장 중요하다.
+메인 차트 화면이 전체 문법을 잡기 때문이다.
+
+
+8. 추가 보정용 문장
+
+차트가 흐리게 나오면:
+- "sharper chart rendering, cleaner candle edges, realistic tradingview-like precision, crisp axis labels"
+
+카드가 너무 많으면:
+- "reduce card usage, use flatter panels and thin separators, more like a real Korean exchange app"
+
+너무 드리블 샷처럼 나오면:
+- "less conceptual dribbble shot, more practical shipping product UI"
+
+너무 화려하면:
+- "more restrained, more realistic, more utility-driven, less decorative"
+
+너무 빗썸과 멀면:
+- "closer to Korean exchange app density and information hierarchy, subtle Bithumb-inspired spacing and restraint"
+
+
+9. 구현용 참고 메모
+
+이미지를 나중에 프론트로 옮길 생각이면 아래 조건을 꼭 지켜야 한다.
+
+- 정면 스크린샷처럼 생성할 것
+- 원근 왜곡 금지
+- 손, 기기 프레임, 배경 장식 제거
+- 실제 앱처럼 패널 높이와 탭 수를 현실적으로 둘 것
+- 텍스트는 한글 위주로
+- 빈 장식 요소를 넣지 말 것
+
+
+10. 마지막 권장 프롬프트 세트
+
+가장 먼저 돌릴 1차 프롬프트:
+
+"ChainSweep, Korean mobile crypto trading app UI, Bithumb-inspired but not copied 1:1, realistic production-ready app screen, ultra clean exchange interface, data-dense layout, white background, thin dividers, restrained flat design, minimal shadows, subtle motion-ready design language, Korean text UI, red for rising prices, blue for falling prices, dark gray typography, compact spacing, precise alignment, clear visual hierarchy, realistic chart/trading interface, front-facing screenshot, no device frame, no hands, no perspective distortion, no 3D mockup, no glossy glassmorphism, no dribbble fantasy, no oversized rounded cards, no purple gradient, no neon, no gaming UI, highly implementable mobile UI, iPhone-style safe area, portrait 9:19.5, ChainSweep main trading screen, top center market selector showing two lines '비트코인' and 'BTC / USDT', top right compact ChainSweep badge, timeframe badge '1m', bell notification icon, hamburger menu icon, large current price text, signed percentage and signed price delta below, crisp candlestick chart occupying the main area, volume bars, moving average lines, right-side price axis, bottom time axis, chart zoom controls, clean tab bar with 주문 호가 차트 시세 정보, active tab is 차트"
+
+네거티브:
+
+"desktop dashboard, tablet, laptop, 3D mockup, hand holding phone, perspective angle, oversized rounded cards, glassmorphism, purple gradient, neon, gaming UI, fantasy fintech, blurry chart, illustration, too much empty whitespace, english-heavy UI"
+

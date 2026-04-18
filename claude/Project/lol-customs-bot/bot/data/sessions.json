@@ -1,0 +1,18 @@
+{
+  "65b14e36-311c-4b96-9568-4141f3a77d3b": {
+    "id": "65b14e36-311c-4b96-9568-4141f3a77d3b",
+    "type": "custom",
+    "hostId": "975791855893635072",
+    "hostName": "123",
+    "mode": null,
+    "partySize": null,
+    "partyGameMode": null,
+    "status": "recruiting",
+    "participants": [],
+    "messageId": null,
+    "channelId": null,
+    "createdAt": 1774274533186,
+    "joinLog": [],
+    "blocked": []
+  }
+}

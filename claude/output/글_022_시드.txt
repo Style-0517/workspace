@@ -1,0 +1,113 @@
+Seed generated successfully
+
+seed_id: seed_b2fa45e10b72
+interview_id: interview_20260411_131711
+ambiguity_score: 0.17
+created_at: 2026-04-11T13:39:18.801573Z
+
+goal: Binance 공식 API 기반의 로그인 없는 1인용 웹앱으로 BTCUSDT와 ETHUSDT의 1분봉·5분봉 실시간 차트를 표시하고, 미리
+  정의된 3개의 트레이딩 공식을 감지해 3초 이내 브라우저 알림을 제공하며 사용자가 수동으로 모의 주문을 입력할 수 있게 한다
+task_type: code
+brownfield_context:
+  project_type: greenfield
+  context_references: []
+  existing_patterns: []
+  existing_dependencies: []
+constraints:
+- 로그인 없는 1인용 웹앱이어야 한다
+- 같은 브라우저 화면 안에서 차트·알림·모의 주문 입력을 처리해야 한다
+- 사용자는 공식을 직접 만들거나 수정할 수 없어야 한다
+- 미리 정의된 승률 높은 매매법 3개만 지원해야 한다
+- 대상 시장은 Binance BTCUSDT와 ETHUSDT로 제한해야 한다
+- 감지 시간봉은 1분봉과 5분봉만 지원해야 한다
+- 실시간 시세·캔들 데이터는 Binance 공식 API를 직접 사용해야 한다
+- 외부 차트/중계 서비스 의존은 피하되 차트 렌더링 라이브러리 사용은 허용된다
+- 외부 알림 채널, 계정 기능, 사용자 저장 기능은 제외한다
+- 알림 상태와 모의 주문 내역은 브라우저 로컬 저장으로 새로고침 후에도 유지되어야 한다
+acceptance_criteria:
+- 미리 정의된 트레이딩 공식 3개가 시스템에 탑재되어 사용자 편집 없이 선택 가능하거나 참조 가능하다
+- Binance 공식 API로 BTCUSDT와 ETHUSDT의 1분봉·5분봉 실시간 데이터를 수신한다
+- 웹앱에서 실시간 차트를 동일 브라우저 화면에 표시한다
+- 현재 차트가 지원 공식 조건과 일치할 때 이를 자동 감지한다
+- 공식 일치 판단 후 3초 이내에 브라우저 내 알림이 사용자에게 표시된다
+- 사용자는 알림과 차트를 참고해 수동으로 모의 주문을 입력할 수 있다
+- 입력한 모의 주문 내역이 브라우저 로컬 저장에 보존되어 새로고침 후에도 유지된다
+- 알림 상태가 브라우저 로컬 저장에 보존되어 새로고침 후에도 유지된다
+- 로그인, 외부 푸시/이메일/메신저 알림, 대규모 커뮤니티 기능 없이 동작한다
+ontology_schema:
+  name: CryptoMockTradingSignal
+  description: 미리 정의된 트레이딩 공식의 차트 감지, 브라우저 알림, 수동 모의 주문, 로컬 저장 상태를 표현하는 개인용 암호화폐 모의매매 도메인 모델
+  fields:
+  - name: formula_id
+    type: string
+    description: 미리 정의된 3개 공식 중 하나를 식별하는 ID
+    required: true
+  - name: formula_name
+    type: string
+    description: 사용자에게 표시되는 공식 이름
+    required: true
+  - name: symbol
+    type: string
+    description: 감지 대상 시장 심볼로 BTCUSDT 또는 ETHUSDT
+    required: true
+  - name: timeframe
+    type: string
+    description: 감지 대상 시간봉으로 1m 또는 5m
+    required: true
+  - name: chart_data
+    type: array
+    description: Binance 공식 API에서 수신한 실시간 캔들 데이터 집합
+    required: true
+  - name: match_detected
+    type: boolean
+    description: 현재 차트가 공식 조건과 일치하는지 여부
+    required: true
+  - name: detected_at
+    type: string
+    description: 공식 일치가 판정된 시각
+    required: true
+  - name: alert_state
+    type: object
+    description: 브라우저 내 알림 표시 여부와 전달 시각 상태
+    required: true
+  - name: mock_order
+    type: object
+    description: 사용자가 수동 입력한 모의 주문 정보
+    required: true
+  - name: history
+    type: array
+    description: 로컬 저장되는 알림 및 모의 주문 이력
+    required: true
+evaluation_principles:
+- name: realtime_accuracy
+  description: Binance 실시간 캔들 기반 감지와 차트 반영이 정확해야 한다
+  weight: 0.3
+- name: alert_latency
+  description: 공식 일치 후 3초 이내 알림 도달 요구를 충족해야 한다
+  weight: 0.25
+- name: scope_discipline
+  description: MVP 범위를 벗어나는 로그인·외부 알림·공식 편집 기능을 포함하지 않아야 한다
+  weight: 0.2
+- name: usability
+  description: 한 화면에서 차트 확인, 알림 인지, 수동 모의 주문 입력이 직관적으로 가능해야 한다
+  weight: 0.15
+- name: persistence
+  description: 알림 상태와 모의 주문 내역이 새로고침 후에도 안정적으로 유지되어야 한다
+  weight: 0.1
+exit_conditions:
+- name: mvp_complete
+  description: 정의된 MVP 기능이 모두 구현되고 검증됨
+  criteria: 3개 공식 지원, 지정 심볼·시간봉 감지, 3초 이내 브라우저 알림, 수동 모의 주문 입력, 로컬 저장 유지 충족
+- name: out_of_scope_requested
+  description: MVP 범위를 벗어난 요구가 핵심 범위를 대체하려 함
+  criteria: 로그인, 외부 알림 채널, 사용자 공식 편집, 커뮤니티 플랫폼 요구 발생
+- name: data_integration_blocked
+  description: Binance 공식 API 직접 연동이 불가능해 핵심 감지 기능을 수행할 수 없음
+  criteria: 실시간 캔들 수신 또는 조건 판별 불가
+metadata:
+  seed_id: seed_b2fa45e10b72
+  version: 1.0.0
+  created_at: '2026-04-11T13:39:18.801573Z'
+  ambiguity_score: 0.17
+  interview_id: interview_20260411_131711
+  parent_seed_id: null
